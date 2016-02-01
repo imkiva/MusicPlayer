@@ -8,9 +8,15 @@
 #include "koll/Keyboard.h"
 #include "koll/Screen.h"
 
+#define PAGE_ITEM 9
+
 namespace kiva {
 
-#define PAGE_ITEM 9
+typedef enum {
+	LOOP_ALL,
+	LOOP_ONE,
+	RANDOM
+} PlayMode;
 
 class PlayerUI : public EventEmiter<std::string> {
 private:
@@ -20,6 +26,7 @@ private:
 	std::vector<MusicEntry> data;
 	volatile int current;
 	volatile int page;
+	volatile PlayMode playMode;
 	
 	SLmillisecond currDuration;
 	SLmillisecond currPosition;
@@ -41,6 +48,7 @@ private:
 	void showPlayList();
 	void showHelp();
 	void showLyric(const Lyric &ly);
+	void showProgress();
 	void printUI();
 	
 public:

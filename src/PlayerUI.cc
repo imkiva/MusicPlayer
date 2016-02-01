@@ -1,3 +1,6 @@
+#include <time.h>
+#include <stdlib.h>
+
 #include <iostream>
 
 #include "Control.h"
@@ -17,6 +20,19 @@ static const char* getStateString(PlayState s)
 		return "已暂停";
 	case STOPPED:
 		return "已停止";
+	}
+}
+
+
+static const char* getModeString(PlayMode s)
+{
+	switch(s) {
+	case LOOP_ALL:
+		return "列表循环";
+	case LOOP_ONE:
+		return "单曲循环";
+	case RANDOM:
+		return "随机播放";
 	}
 }
 
@@ -55,6 +71,10 @@ PlayerUI::PlayerUI()
 	
 	keyboard->on(CPLAYLIST, [&](const int &key) {
 		this->emit("toggle-play-list");
+	});
+	
+	keyboard->on(CMODE, [&](const int &key) {
+		this->emit("toggle-mode");
 	});
 	
 	keyboard->on('0', '9', [&](const int &key) {
@@ -158,7 +178,7 @@ void PlayerUI::showHelp() {
 	
 	printf("操作方式: \n");
 	printf(" %s: %c  退出: %c", (s == PAUSED ? "继续" : "暂停"), CPAUSE, CEXIT);
-	printf("  切换帮助: %c  %s: %c\n", CHELP, (needShowPlayList ? "隐藏列表" : "显示列表"), CPLAYLIST);
+	printf("  切换帮助: %c  %s: %c  播放模式: %c\n", CHELP, (needShowPlayList ? "隐藏列表" : "显示列表"), CPLAYLIST, CMODE);
 	
 	printf(" 下一曲: %c  上一曲: %c", CNEXT, CPREV);
 	printf("  下一页: %c  上一页: %c\n", CPAGENEXT, CPAGEPREV);
@@ -167,6 +187,12 @@ void PlayerUI::showHelp() {
 
 void PlayerUI::showLyric(const Lyric &ly)
 {
+	if (!ly.hasData()) {
+		return;
+	}
+	
+	printf("\n");
+	
 	int index;
 	const std::string &mid = ly.getLyric(currPosition, &index);
 	
@@ -184,6 +210,23 @@ void PlayerUI::showLyric(const Lyric &ly)
 	
 	Screen::mprint(ly.getLyricAt(index+1));
 	printf("\n");
+}
+
+
+void PlayerUI::showProgress()
+{
+	int w = Screen::get()->getWidth() - 2;
+	int p = 1.0 * currPosition / currDuration * w;
+	
+	printf("[");
+	for (int i=0; i<w; i++) {
+		if (i <= p) {
+			printf("=");
+		} else {
+			printf(" ");
+		}
+	}
+	printf("]\n");
 }
 
 
@@ -205,9 +248,9 @@ void PlayerUI::printUI()
 	
 	Screen::clear();
 	printf("%s (%d/%d): %s - %s\n", getStateString(currState), current, data.size()-1, currName, currArtist);
-	printf("进度: %lu:%d/%lu:%d\n", cur/60, cur%60, dur/60, dur%60);
+	printf("播放模式: %s  进度: %02lu:%02d/%02lu:%02d\n", getModeString(playMode), cur/60, cur%60, dur/60, dur%60);
 	
-	printf("\n");
+	showProgress();
 	showLyric(e.getLyric());
 	
 	printf("\n");
@@ -225,16 +268,19 @@ void PlayerUI::setData(const std::vector<MusicEntry> &data)
 
 int PlayerUI::exec()
 {
+	current = 0;
+	page = 0;
 	finish = false;
+	playMode = DEFAULT_PLAY_MODE;
 	needShowHelp = DEFAULT_SHOW_HELP;
 	needShowPlayList = DEFAULT_SHOW_PLAY_LIST;
 	
 	volatile bool ui = false;
 	
+	srand(time(NULL));
+	
 	this->on("start", [&](void *p) {
 		keyboard->start();
-		current = 0;
-		page = 0;
 		
 		if (data.size() == 0) {
 			printf("未找到音乐\n");
@@ -243,7 +289,19 @@ int PlayerUI::exec()
 		}
 		
 		player.setCallback([&]() {
-			this->emit("next");
+			switch(this->playMode) {
+			case LOOP_ALL:
+				this->emit("next");
+				break;
+			
+			case LOOP_ONE:
+				this->play(current);
+				break;
+			
+			case RANDOM:
+				play(rand() % data.size());
+				break;
+			}
 		});
 		
 		play(0);
@@ -286,6 +344,22 @@ int PlayerUI::exec()
 	
 	this->on("toggle-play-list", [&](void *p) {
 		needShowPlayList = !needShowPlayList;
+	});
+	
+	this->on("toggle-mode", [&](void *p) {
+		switch(this->playMode) {
+		case LOOP_ALL:
+			playMode = LOOP_ONE;
+			break;
+		
+		case LOOP_ONE:
+			playMode = RANDOM;
+			break;
+		
+		case RANDOM:
+			playMode = LOOP_ALL;
+			break;
+		}
 	});
 	
 	this->on("numkey", [&](void *p) {

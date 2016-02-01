@@ -42,6 +42,8 @@ public:
 	
 	const std::string& getArtist() const;
 	const std::string& getTitle() const;
+	
+	bool hasData() const;
 };
 
 }

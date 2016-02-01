@@ -1,7 +1,5 @@
 #pragma once
 
-#include "koll/Keyboard.h"
-
 /*
  * 此处定义 PlayerUI 中的操作方式
  */
@@ -24,6 +22,9 @@
 /* 快进 */
 #define CSEEKR koll::Keyboard::RIGHT
 
+/* 切换播放模式 */
+#define CMODE 'z'
+
 /* 播放列表 下一页 */
 #define CPAGENEXT 'v'
 
@@ -42,3 +43,6 @@
 
 /* 默认显示播放列表 */
 #define DEFAULT_SHOW_PLAY_LIST true
+
+/* 默认播放模式: 列表循环 */
+#define DEFAULT_PLAY_MODE LOOP_ALL

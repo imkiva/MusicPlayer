@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include "LocalCache.h"
@@ -8,13 +9,23 @@ using namespace std;
 using namespace kiva;
 
 int main(int argc, char **argv) {
-	argc--;
-	argv++;
+	opterr = 0;
+	int result;
+	
+	bool update = false;
+	
+	while ((result = getopt(argc, argv, "u")) != -1) {
+		switch(result) {
+		case 'u': /* update cache */
+			update = true;
+			break;
+		}
+	}
 	
 	std::string sdcard;
 	
-	if (argv[0]) {
-		sdcard.assign(argv[0]);
+	if (argv[optind]) {
+		sdcard.assign(argv[optind]);
 	} else {
 		const char *p = getenv("EXTERNAL_STORAGE");
 		if (p) {
@@ -25,6 +36,10 @@ int main(int argc, char **argv) {
 	}
 	
 	std::string cacheFile = sdcard + "/Android/.player_cache";
+	
+	if (update) {
+		unlink(cacheFile.c_str());
+	}
 	
 	PlayerUI ui;
 	LocalCache cache(cacheFile);

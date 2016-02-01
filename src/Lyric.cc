@@ -200,3 +200,8 @@ const std::string& Lyric::getTitle() const
 }
 
 
+bool Lyric::hasData() const
+{
+	return data.size() > 0;
+}
+

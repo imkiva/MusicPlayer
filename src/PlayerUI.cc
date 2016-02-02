@@ -39,6 +39,7 @@ static const char* getModeString(PlayMode s)
 
 
 PlayerUI::PlayerUI()
+	:lyDownloader(new CloudMusicApi())
 {
 	keyboard = Keyboard::getDefault();
 	
@@ -106,6 +107,10 @@ void PlayerUI::play(int pos)
 	
 	current = pos;
 	const MusicEntry &e = data[pos];
+	
+	if (!e.getLyric().hasData()) {
+		lyDownloader.downloadLyric(&(data[pos]));
+	}
 	
 	player.setSource(e.getPath().c_str());
 	player.play();

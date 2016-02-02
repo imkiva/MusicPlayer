@@ -4,6 +4,7 @@
 #include "MusicScanner.h"
 #include "MusicEntry.h"
 #include "MusicPlayer.h"
+#include "LyricDownloader.h"
 
 #include "koll/Keyboard.h"
 #include "koll/Screen.h"
@@ -12,16 +13,18 @@
 
 namespace kiva {
 
-typedef enum {
+enum PlayMode
+{
 	LOOP_ALL,
 	LOOP_ONE,
 	RANDOM
-} PlayMode;
+};
 
 class PlayerUI : public EventEmiter<std::string> {
 private:
 	koll::Keyboard *keyboard;
 	MusicPlayer player;
+	LyricDownloader lyDownloader;
 	
 	std::vector<MusicEntry> data;
 	volatile int current;

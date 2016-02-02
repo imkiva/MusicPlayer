@@ -13,12 +13,18 @@ MusicEntry::MusicEntry(const std::string &path)
 		parseFileName(name);
 	}
 	
-	const std::string &lrc = path.substr(0, path.find_last_of('.') + 1) + "lrc";
-	lyric.parseFile(lrc);
+	lyricPath = std::move(path.substr(0, path.find_last_of('.') + 1) + "lrc");
+	loadLyric(lyricPath);
 }
 
 MusicEntry::~MusicEntry()
 {
+}
+
+
+const std::string& MusicEntry::getLyricPath() const
+{
+	return lyricPath;
 }
 
 
@@ -35,6 +41,12 @@ void MusicEntry::parseFileName(const std::string &name)
 	}
 	
 	this->name = this->name.substr(0, this->name.rfind("."));
+}
+
+
+void MusicEntry::loadLyric(const std::string &file)
+{
+	lyric.parseFile(file);
 }
 
 

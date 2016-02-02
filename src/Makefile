@@ -5,7 +5,7 @@ $(BIN): $(OBJ)
 
 %.o: %.cc
 	@echo "    CC    $<"
-	@$(CXX) -I. -Iinclude -I../include $(CXXFLAGS) -c $< -o $@
+	@$(CXX) -I. -Iinclude $(CXXFLAGS) -c $< -o $@
 
 
 .PHONY : clean

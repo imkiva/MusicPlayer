@@ -10,13 +10,14 @@
 
 namespace kiva {
 
-typedef enum {
+enum PlayState
+{
 	NOT_READY,
 	WAITING,
 	PLAYING,
 	PAUSED,
 	STOPPED
-} PlayState;
+};
 
 
 class MusicPlayer

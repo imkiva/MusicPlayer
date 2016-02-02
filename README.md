@@ -9,6 +9,7 @@ See `include/Control.h` to customize keyboard bindings. <br/>
 - Play list cache
 - Seek
 - Lyric support(lrc only)
+- Download lyric from network
 - Progress bar
 
 ## Know Issues

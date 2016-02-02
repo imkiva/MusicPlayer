@@ -23,7 +23,8 @@ public:
 class CloudMusicApi : public MusicApi {
 private:
 	std::string host = "music.163.com";
-	std::string param = "/api/search/get?type=1&offset=0&limit=1&s=";
+	std::string idParam = "/api/search/get?type=1&offset=0&limit=1&s=";
+	std::string lyricParam = "/api/song/lyric?lv=-1&kv=-1&tv=-1&id=";
 
 	int getMusicId(const std::string &name);
 

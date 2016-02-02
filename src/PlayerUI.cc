@@ -5,6 +5,7 @@
 
 #include "Control.h"
 #include "PlayerUI.h"
+#include "Thread.h"
 
 using namespace kiva;
 using namespace koll;
@@ -393,7 +394,7 @@ int PlayerUI::exec()
 	while (!finish) {
 		if (ui) {
 			printUI();
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			THREAD_SLEEP(100);
 		}
 	}
 	

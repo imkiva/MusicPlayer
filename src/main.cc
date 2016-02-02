@@ -5,8 +5,17 @@
 #include "LocalCache.h"
 #include "PlayerUI.h"
 
+#define ALENGTH(x) (sizeof(x)/sizeof(x[0]))
+
 using namespace std;
 using namespace kiva;
+
+static char bar[] = {
+	'|', '/', '-', '\\'
+};
+
+static int barIndex = 0;
+
 
 int main(int argc, char **argv) {
 	opterr = 0;
@@ -47,10 +56,23 @@ int main(int argc, char **argv) {
 	auto err = [&](void *p) {
 		printf("缓存不存在或已过期, 重新扫描\n");
 		
-		MusicScanner sr(sdcard, [&]() {
+		MusicScanner sr(sdcard);
+		
+		sr.on("finish", [&](void *p) {
 			printf("扫描完毕\n");
 			cache.writePlayListCache(sr.getResult());
 			ui.setData(sr.getResult());
+		});
+		
+		sr.on("progress-bar", [&](void *p) {
+			*((int*) p) = 100; // interval
+			
+			printf("%c\r", bar[barIndex++]);
+			fflush(stdout);
+			
+			if (barIndex >= ALENGTH(bar)) {
+				barIndex = 0;
+			}
 		});
 		
 		sr.start();

@@ -27,7 +27,7 @@ private:
 
 public:
 	LocalCache(const std::string &file);
-	~LocalCache();
+	virtual ~LocalCache();
 	
 	void readPlayListCache();
 	void writePlayListCache(const std::vector<MusicEntry> &vec);

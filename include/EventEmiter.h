@@ -10,7 +10,8 @@ namespace kiva {
 typedef std::function<void(void*)> EventCallback;
 
 template <typename T>
-class EventEmiter {
+class EventEmiter
+{
 private:
 	std::map<T, EventCallback> event;
 	std::mutex evMutex;

@@ -17,7 +17,7 @@ MusicPlayer::~MusicPlayer()
 }
 
 
-SLmillisecond MusicPlayer::getDuration()
+Millisecond MusicPlayer::getDuration()
 {
 	if (!uriPlayerPlay) {
 		return 0;
@@ -30,7 +30,7 @@ SLmillisecond MusicPlayer::getDuration()
 }
 
 
-void MusicPlayer::seek(SLmillisecond pos)
+void MusicPlayer::seek(Millisecond pos)
 {
 	std::lock_guard<std::mutex> lock(mutex);
 	
@@ -47,7 +47,7 @@ void MusicPlayer::seek(SLmillisecond pos)
 }
 
 
-SLmillisecond MusicPlayer::getPosition()
+Millisecond MusicPlayer::getPosition()
 {
 	if (!uriPlayerPlay) {
 		return 0;

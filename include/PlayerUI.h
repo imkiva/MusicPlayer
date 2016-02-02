@@ -20,7 +20,8 @@ enum PlayMode
 	RANDOM
 };
 
-class PlayerUI : public EventEmiter<std::string> {
+class PlayerUI : public EventEmiter<std::string>
+{
 private:
 	koll::Keyboard *keyboard;
 	MusicPlayer player;
@@ -31,8 +32,8 @@ private:
 	volatile int page;
 	volatile PlayMode playMode;
 	
-	SLmillisecond currDuration;
-	SLmillisecond currPosition;
+	Millisecond currDuration;
+	Millisecond currPosition;
 	const char *currName;
 	const char *currArtist;
 	PlayState currState;

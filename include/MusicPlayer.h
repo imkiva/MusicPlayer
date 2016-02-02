@@ -8,7 +8,11 @@
 #include <string>
 #include <functional>
 
+#include "EventEmiter.h"
+
 namespace kiva {
+
+typedef uint32_t Millisecond;
 
 enum PlayState
 {
@@ -17,6 +21,24 @@ enum PlayState
 	PLAYING,
 	PAUSED,
 	STOPPED
+};
+
+
+/**
+ * EventEmiter:
+ *  finish : current sone finish playing
+ */
+class Player : public EventEmiter<std::string>
+{
+public:
+	virtual void play() = 0;
+	virtual void pause() = 0;
+	virtual void stop() = 0;
+	virtual void seek(Millisecond pos) = 0;
+	
+	virtual PlayState getState() = 0;
+	virtual Millisecond getDuration() = 0;
+	virtual Millisecond getPosition() = 0;
 };
 
 
@@ -41,13 +63,10 @@ private:
 
 private:
 	bool initMusicPlayer();
-	void initMusicEngine();
-	
-	bool loadMusic(const char *uriPath);
-	void setPlaying(bool played);
 	void destroyMusicPlayer();
-
 	void onFinishInternal();
+	
+	void setPlaying(bool played);
 
 public:
 	MusicPlayer();
@@ -56,13 +75,13 @@ public:
 	bool setSource(const std::string &path);
 	void setCallback(const std::function<void()> &cb);
 	PlayState getState();
-	SLmillisecond getDuration();
-	SLmillisecond getPosition();
+	Millisecond getDuration();
+	Millisecond getPosition();
 	
 	void play();
 	void pause();
 	void stop();
-	void seek(SLmillisecond pos);
+	void seek(Millisecond pos);
 };
 
 }

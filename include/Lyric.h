@@ -1,22 +1,23 @@
 #pragma once
 
-#include <stdint.h>
-#include <SLES/OpenSLES.h>
-
 #include <vector>
 #include <string>
 
+#include "MusicPlayer.h"
+
 namespace kiva {
 
-typedef SLmillisecond LyricTime;
+typedef Millisecond LyricTime;
 
-typedef struct {
+typedef struct
+{
 	std::string lyric;
 	LyricTime startTime;
 	LyricTime endTime;
 } LyricItem;
 
-class Lyric {
+class Lyric
+{
 private:
 	std::string ar;
 	std::string ti;

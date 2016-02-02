@@ -249,8 +249,8 @@ void PlayerUI::printUI()
 	currPosition = player.getPosition();
 	currDuration = player.getDuration();
 	
-	SLmillisecond cur = currPosition / 1000;
-	SLmillisecond dur = currDuration / 1000;
+	Millisecond cur = currPosition / 1000;
+	Millisecond dur = currDuration / 1000;
 	
 	Screen::clear();
 	printf("%s (%d/%d): %s - %s\n", getStateString(currState), current, data.size()-1, currName, currArtist);
@@ -379,8 +379,8 @@ int PlayerUI::exec()
 	
 	this->on("seek-left", [&](void *p) {
 		// 5s
-		SLmillisecond pos = player.getPosition();
-		SLmillisecond d = 5000;
+		Millisecond pos = player.getPosition();
+		Millisecond d = 5000;
 		if (pos < d) {
 			pos = 0;
 		} else {
@@ -391,7 +391,7 @@ int PlayerUI::exec()
 	
 	this->on("seek-right", [&](void *p) {
 		// 5s
-		SLmillisecond pos = player.getPosition() + 5000;
+		Millisecond pos = player.getPosition() + 5000;
 		player.seek(pos);
 	});
 	

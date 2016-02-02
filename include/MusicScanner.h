@@ -12,7 +12,8 @@
 
 namespace kiva {
 
-class MusicScanner : public EventEmiter<std::string> {
+class MusicScanner : public EventEmiter<std::string>
+{
 private:
 	std::thread scanThread;
 	std::thread progressBarThread;

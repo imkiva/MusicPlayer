@@ -9,12 +9,15 @@
 
 namespace kiva {
 
-typedef struct {
+typedef struct
+{
 	const MusicEntry *ent;
 	const std::string *lyric;
 } DownloadedLyric;
 
-class MusicApi {
+
+class MusicApi
+{
 public:
 	virtual bool downloadLyric(const std::string &musicName, std::string &lyric) = 0;
 };
@@ -32,7 +35,7 @@ public:
 	CloudMusicApi();
 	~CloudMusicApi();
 
-	virtual bool downloadLyric(const std::string &musicName, std::string &lyric);
+	bool downloadLyric(const std::string &musicName, std::string &lyric);
 };
 
 

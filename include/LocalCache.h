@@ -17,7 +17,8 @@
 
 namespace kiva {
 
-class LocalCache : public EventEmiter<std::string> {
+class LocalCache : public EventEmiter<std::string>
+{
 private:
 	std::string file;
 	std::thread thr;

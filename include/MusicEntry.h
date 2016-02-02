@@ -6,10 +6,9 @@
 
 namespace kiva {
 
-class MusicEntry {
+class MusicEntry
+{
 private:
-	friend class LyricDownloader;
-	
 	std::string name;
 	std::string artist;
 	std::string path;

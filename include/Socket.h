@@ -35,7 +35,8 @@ enum SocketType
 
 
 
-class Socket {
+class Socket
+{
 private:
 	int fd;
 	struct sockaddr_in addr;

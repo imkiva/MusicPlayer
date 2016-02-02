@@ -13,7 +13,8 @@ enum HttpMethod
 };
 
 
-class Http {
+class Http
+{
 private:
 	HttpMethod method;
 	Socket sock;

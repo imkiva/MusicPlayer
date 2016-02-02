@@ -3,7 +3,7 @@
 #include <unistd.h>
 
 #include "LocalCache.h"
-#include "PlayerUI.h"
+#include "MainUI.h"
 
 #define ALENGTH(x) (sizeof(x)/sizeof(x[0]))
 
@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
 		unlink(cacheFile.c_str());
 	}
 	
-	PlayerUI ui;
+	MainUI ui;
 	LocalCache cache(cacheFile);
 
 	auto err = [&](void *p) {

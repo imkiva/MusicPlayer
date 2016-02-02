@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-#include "MusicPlayer.h"
+#include "Player.h"
 
 namespace kiva {
 

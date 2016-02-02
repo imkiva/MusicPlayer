@@ -3,7 +3,7 @@
 #include "EventEmiter.h"
 #include "MusicScanner.h"
 #include "MusicEntry.h"
-#include "MusicPlayer.h"
+#include "Player.h"
 #include "LyricDownloader.h"
 
 #include "koll/Keyboard.h"
@@ -20,11 +20,12 @@ enum PlayMode
 	RANDOM
 };
 
-class PlayerUI : public EventEmiter<std::string>
+class MainUI : public EventEmiter<std::string>
 {
 private:
 	koll::Keyboard *keyboard;
-	MusicPlayer player;
+	Player *player;
+	
 	LyricDownloader lyDownloader;
 	
 	std::vector<MusicEntry> data;
@@ -56,8 +57,8 @@ private:
 	void printUI();
 	
 public:
-	PlayerUI();
-	virtual ~PlayerUI();
+	MainUI();
+	virtual ~MainUI();
 	
 	void setData(const std::vector<MusicEntry> &data);
 	int exec();

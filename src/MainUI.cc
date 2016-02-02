@@ -4,8 +4,9 @@
 #include <iostream>
 
 #include "Control.h"
-#include "PlayerUI.h"
+#include "MainUI.h"
 #include "Thread.h"
+#include "OpenSLESMusicPlayer.h"
 
 using namespace kiva;
 using namespace koll;
@@ -38,8 +39,9 @@ static const char* getModeString(PlayMode s)
 }
 
 
-PlayerUI::PlayerUI()
-	:lyDownloader(new CloudMusicApi())
+MainUI::MainUI()
+	:lyDownloader(new CloudMusicApi()),
+	player(new OpenSLESMusicPlayer())
 {
 	keyboard = Keyboard::getDefault();
 	
@@ -94,12 +96,13 @@ PlayerUI::PlayerUI()
 }
 
 
-PlayerUI::~PlayerUI()
+MainUI::~MainUI()
 {
+	delete player;
 }
 
 
-void PlayerUI::play(int pos)
+void MainUI::play(int pos)
 {
 	if (pos < 0 || pos >= data.size()) {
 		return;
@@ -112,12 +115,12 @@ void PlayerUI::play(int pos)
 		lyDownloader.downloadLyric(&(data[pos]));
 	}
 	
-	player.setSource(e.getPath().c_str());
-	player.play();
+	player->setSource(e.getPath());
+	player->play();
 }
 
 
-void PlayerUI::playNext()
+void MainUI::playNext()
 {
 	if (current == data.size()-1) {
 		play(0);
@@ -127,7 +130,7 @@ void PlayerUI::playNext()
 }
 
 
-void PlayerUI::playPrev()
+void MainUI::playPrev()
 {
 	if (current == 0) {
 		play(data.size()-1);
@@ -137,13 +140,13 @@ void PlayerUI::playPrev()
 }
 
 
-int PlayerUI::getIndex(int page, int i)
+int MainUI::getIndex(int page, int i)
 {
 	return page * PAGE_ITEM + i;
 }
 
 
-void PlayerUI::showPlayList() {
+void MainUI::showPlayList() {
 	if (!needShowPlayList) {
 		return;
 	}
@@ -175,12 +178,12 @@ void PlayerUI::showPlayList() {
 }
 
 
-void PlayerUI::showHelp() {
+void MainUI::showHelp() {
 	if (!needShowHelp) {
 		return;
 	}
 	
-	PlayState s = player.getState();
+	PlayState s = player->getState();
 	
 	printf("操作方式: \n");
 	printf(" %s: %c  退出: %c", (s == PAUSED ? "继续" : "暂停"), CPAUSE, CEXIT);
@@ -191,7 +194,7 @@ void PlayerUI::showHelp() {
 }
 
 
-void PlayerUI::showLyric(const Lyric &ly)
+void MainUI::showLyric(const Lyric &ly)
 {
 	if (!ly.hasData()) {
 		return;
@@ -219,7 +222,7 @@ void PlayerUI::showLyric(const Lyric &ly)
 }
 
 
-void PlayerUI::showProgress()
+void MainUI::showProgress()
 {
 	int w = Screen::get()->getWidth() - 2;
 	int p = 1.0 * currPosition / currDuration * w;
@@ -236,9 +239,9 @@ void PlayerUI::showProgress()
 }
 
 
-void PlayerUI::printUI()
+void MainUI::printUI()
 {
-	currState = player.getState();
+	currState = player->getState();
 	if (currState == NOT_READY) {
 		return;
 	}
@@ -246,8 +249,8 @@ void PlayerUI::printUI()
 	const MusicEntry &e = data[current];
 	currName = e.getName().c_str();
 	currArtist = e.getArtist().c_str();
-	currPosition = player.getPosition();
-	currDuration = player.getDuration();
+	currPosition = player->getPosition();
+	currDuration = player->getDuration();
 	
 	Millisecond cur = currPosition / 1000;
 	Millisecond dur = currDuration / 1000;
@@ -265,14 +268,14 @@ void PlayerUI::printUI()
 }
 
 
-void PlayerUI::setData(const std::vector<MusicEntry> &data)
+void MainUI::setData(const std::vector<MusicEntry> &data)
 {
 	this->data = std::move(data);
 	emit("start");
 }
 
 
-int PlayerUI::exec()
+int MainUI::exec()
 {
 	current = 0;
 	page = 0;
@@ -294,7 +297,7 @@ int PlayerUI::exec()
 			return;
 		}
 		
-		player.setCallback([&]() {
+		player->on("finish", [&](void *p) {
 			switch(this->playMode) {
 			case LOOP_ALL:
 				this->emit("next");
@@ -315,7 +318,7 @@ int PlayerUI::exec()
 	});
 	
 	this->on("pause", [&](void *p) {
-		player.pause();
+		player->pause();
 	});
 	
 	this->on("next", [&](void *p) {
@@ -379,20 +382,20 @@ int PlayerUI::exec()
 	
 	this->on("seek-left", [&](void *p) {
 		// 5s
-		Millisecond pos = player.getPosition();
+		Millisecond pos = player->getPosition();
 		Millisecond d = 5000;
 		if (pos < d) {
 			pos = 0;
 		} else {
 			pos -= d;
 		}
-		player.seek(pos);
+		player->seek(pos);
 	});
 	
 	this->on("seek-right", [&](void *p) {
 		// 5s
-		Millisecond pos = player.getPosition() + 5000;
-		player.seek(pos);
+		Millisecond pos = player->getPosition() + 5000;
+		player->seek(pos);
 	});
 	
 	
@@ -412,6 +415,8 @@ int PlayerUI::exec()
 	removeEvent("seek-left");
 	removeEvent("seek-right");
 	removeEvent("data");
+	
+	Screen::clear();
 	return 0;
 }
 

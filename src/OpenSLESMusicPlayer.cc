@@ -1,23 +1,23 @@
-#include "MusicPlayer.h"
+#include "OpenSLESMusicPlayer.h"
 
 
 using namespace kiva;
 
 
-MusicPlayer::MusicPlayer()
+OpenSLESMusicPlayer::OpenSLESMusicPlayer()
 {
 	initMusicPlayer();
 }
 
 
-MusicPlayer::~MusicPlayer()
+OpenSLESMusicPlayer::~OpenSLESMusicPlayer()
 {
 	stop();
 	destroyMusicPlayer();
 }
 
 
-Millisecond MusicPlayer::getDuration()
+Millisecond OpenSLESMusicPlayer::getDuration()
 {
 	if (!uriPlayerPlay) {
 		return 0;
@@ -30,7 +30,7 @@ Millisecond MusicPlayer::getDuration()
 }
 
 
-void MusicPlayer::seek(Millisecond pos)
+void OpenSLESMusicPlayer::seek(Millisecond pos)
 {
 	std::lock_guard<std::mutex> lock(mutex);
 	
@@ -47,7 +47,7 @@ void MusicPlayer::seek(Millisecond pos)
 }
 
 
-Millisecond MusicPlayer::getPosition()
+Millisecond OpenSLESMusicPlayer::getPosition()
 {
 	if (!uriPlayerPlay) {
 		return 0;
@@ -60,7 +60,7 @@ Millisecond MusicPlayer::getPosition()
 }
 
 
-bool MusicPlayer::setSource(const std::string &path)
+bool OpenSLESMusicPlayer::setSource(const std::string &path)
 {
 	std::lock_guard<std::mutex> lock(mutex);
 	
@@ -98,7 +98,8 @@ bool MusicPlayer::setSource(const std::string &path)
 	(*uriPlayerObject)->GetInterface(uriPlayerObject, SL_IID_PLAY,&uriPlayerPlay);
 	
 	(*uriPlayerPlay)->RegisterCallback(uriPlayerPlay, [](SLPlayItf self, void *pthis, SLuint32 ev) {
-		MusicPlayer *thiz = (MusicPlayer*) pthis;
+		OpenSLESMusicPlayer *thiz = (OpenSLESMusicPlayer*) pthis;
+		
 		if (ev & SL_PLAYEVENT_HEADATEND) {
 			thiz->onFinishInternal();
 		}
@@ -113,13 +114,13 @@ bool MusicPlayer::setSource(const std::string &path)
 }
 
 
-PlayState MusicPlayer::getState()
+PlayState OpenSLESMusicPlayer::getState()
 {
 	return playState;
 }
 
 
-void MusicPlayer::play()
+void OpenSLESMusicPlayer::play()
 {
 	switch (playState) {
 	case STOPPED:
@@ -137,7 +138,7 @@ void MusicPlayer::play()
 }
 
 
-void MusicPlayer::pause()
+void OpenSLESMusicPlayer::pause()
 {
 	switch (playState) {
 	case PLAYING:
@@ -152,20 +153,14 @@ void MusicPlayer::pause()
 }
 
 
-void MusicPlayer::stop()
+void OpenSLESMusicPlayer::stop()
 {
 	setPlaying(false);
 	playState = STOPPED;
 }
 
 
-void MusicPlayer::setCallback(const std::function<void()> &cb)
-{
-	this->onFinishCallback = cb;
-}
-
-
-bool MusicPlayer::initMusicPlayer()
+bool OpenSLESMusicPlayer::initMusicPlayer()
 {
 	slCreateEngine(&slObject, 0, NULL, 0, NULL, NULL);
 	
@@ -190,7 +185,7 @@ bool MusicPlayer::initMusicPlayer()
 }
 
 
-void MusicPlayer::setPlaying(bool ing)
+void OpenSLESMusicPlayer::setPlaying(bool ing)
 {
 	if (uriPlayerPlay) {
 		(*uriPlayerPlay)->SetPlayState(uriPlayerPlay, (ing ? SL_PLAYSTATE_PLAYING : SL_PLAYSTATE_PAUSED));
@@ -198,17 +193,15 @@ void MusicPlayer::setPlaying(bool ing)
 }
 
 
-void MusicPlayer::onFinishInternal()
+void OpenSLESMusicPlayer::onFinishInternal()
 {
 	playState = WAITING;
 	
-	if (onFinishCallback) {
-		onFinishCallback();
-	}
+	this->emit("finish");
 }
 
 
-void MusicPlayer::destroyMusicPlayer()
+void OpenSLESMusicPlayer::destroyMusicPlayer()
 {
 	if (uriPlayerObject != NULL) {
 		(*uriPlayerObject)->Destroy(uriPlayerObject);

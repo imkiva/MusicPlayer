@@ -3,6 +3,10 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 
+extern "C" {
+	#include <libavformat/avformat.h>
+}
+
 #include "Player.h"
 
 
@@ -13,8 +17,12 @@ class SDL2MusicPlayer : public Player
 	friend void hookMusicFinish();
 
 private:
-	PlayState playState = NOT_READY;
+	volatile PlayState playState = NOT_READY;
 	Mix_Music *music = NULL;
+	AVFormatContext *formatContext = NULL;
+
+	std::thread clockThread;
+	volatile Millisecond currentPostion;
 
 	std::mutex mutex;
 
@@ -25,6 +33,8 @@ private:
 
 	void onFinishInternal();
 	void setPlaying(bool playing);
+
+	void initFormatContext(const std::string &path);
 
 public:
 	static SDL2MusicPlayer *current;

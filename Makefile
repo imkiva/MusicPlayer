@@ -24,7 +24,7 @@ ifeq ($(TARGET), android)
 	CXXFLAGS += -DANDROID -lOpenSLES
 else
 	SRC += SDL2MusicPlayer.cc
-	CXXFLAGS += -lSDL2 -lSDL2_mixer -lsmpeg2
+	CXXFLAGS += -lm -ldl -lz -lavcodec -lavformat -lavutil -lSDL2 -lSDL2_mixer -lsmpeg2
 endif
 
 

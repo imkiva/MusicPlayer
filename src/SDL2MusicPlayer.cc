@@ -1,4 +1,5 @@
 #include "SDL2MusicPlayer.h"
+#include "Thread.h"
 
 using namespace kiva;
 
@@ -6,7 +7,7 @@ using namespace kiva;
 SDL2MusicPlayer::SDL2MusicPlayer()
 {
 	current = this;
-
+	av_register_all();
 	initMusicPlayer();
 }
 
@@ -15,6 +16,10 @@ SDL2MusicPlayer::~SDL2MusicPlayer()
 {
 	stop();
 	destroyMusicPlayer();
+
+	if (clockThread.joinable()) {
+		clockThread.join();
+	}
 }
 
 
@@ -69,6 +74,31 @@ void SDL2MusicPlayer::destroyMusicPlayer()
 }
 
 
+void SDL2MusicPlayer::initFormatContext(const std::string &path)
+{
+	int ret;
+
+	formatContext = avformat_alloc_context();
+	if (!formatContext) {
+		return;
+	}
+
+	ret = avformat_open_input(&formatContext, path.c_str(), NULL, NULL);
+	if (ret < 0) {
+		avformat_close_input(&formatContext);
+		formatContext = NULL;
+		return;
+	}
+
+	ret = avformat_find_stream_info(formatContext, NULL);
+	if (ret < 0) {
+		avformat_close_input(&formatContext);
+		formatContext = NULL;
+		return;
+	}
+}
+
+
 PlayState SDL2MusicPlayer::getState()
 {
 	return playState;
@@ -104,6 +134,8 @@ bool SDL2MusicPlayer::setSource(const std::string &path)
 		initMusicPlayer();
 	}
 
+	initFormatContext(path);
+
 	music = Mix_LoadMUS(path.c_str());
 	if (!music) {
 		return false;
@@ -111,6 +143,24 @@ bool SDL2MusicPlayer::setSource(const std::string &path)
 
 	Mix_HookMusicFinished([]() {
 		SDL2MusicPlayer::current->onFinishInternal();
+	});
+
+	if (clockThread.joinable()) {
+		clockThread.join();
+	}
+
+	clockThread = std::thread([this]() {
+		THREAD_SLEEP(1000);
+		currentPostion = 1000;
+
+		while (playState != NOT_READY && playState != WAITING) {
+			if (playState == PLAYING) {
+				currentPostion += 100;
+				THREAD_SLEEP(100);
+			}
+		}
+
+		currentPostion = 0;
 	});
 
 	Mix_PlayMusic(music, 0);
@@ -143,18 +193,31 @@ void SDL2MusicPlayer::seek(Millisecond pos)
 
 	Mix_RewindMusic();
 	Mix_SetMusicPosition((double) pos / 1000);
+	currentPostion = pos;
 }
 
 
 Millisecond SDL2MusicPlayer::getPosition()
 {
-	return 0;
+	return currentPostion;
 }
 
 
 Millisecond SDL2MusicPlayer::getDuration()
 {
-	return 0;
+	if (!formatContext) {
+		return 0;
+	}
+
+	if (formatContext->duration == AV_NOPTS_VALUE) {
+		return 0;
+	}
+
+	int64_t duration = formatContext->duration;
+	duration = duration + (duration <= INT64_MAX - 5000 ? 5000 : 0);
+	duration /= 1000;
+
+	return (Millisecond) duration;
 }
 
 

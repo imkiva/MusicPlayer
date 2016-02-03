@@ -5,6 +5,9 @@ A console music player for android, OpenSLES is required. <br/>
 
 See `include/Control.h` to customize keyboard bindings. <br/>
 
+## Screenshot
+![image](https://github.com/zt515/MusicPlayer/raw/master/screenshot/android.png)
+
 ## Feature
 - Play list cache
 - Seek

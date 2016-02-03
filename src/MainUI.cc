@@ -6,7 +6,12 @@
 #include "Control.h"
 #include "MainUI.h"
 #include "Thread.h"
-#include "OpenSLESMusicPlayer.h"
+
+#ifdef ANDROID
+#	include "OpenSLESMusicPlayer.h"
+#else
+#	include "SDL2MusicPlayer.h"
+#endif
 
 using namespace kiva;
 using namespace koll;
@@ -40,9 +45,15 @@ static const char* getModeString(PlayMode s)
 
 
 MainUI::MainUI()
-	:lyDownloader(new CloudMusicApi()),
-	player(new OpenSLESMusicPlayer())
+	:lyDownloader(new CloudMusicApi())
 {
+
+#ifdef ANDROID
+	player = new OpenSLESMusicPlayer();
+#else
+	player = new SDL2MusicPlayer();
+#endif
+
 	keyboard = Keyboard::getDefault();
 	
 	keyboard->on(CEXIT, [&](const int &key) {
@@ -83,7 +94,7 @@ MainUI::MainUI()
 	
 	keyboard->on('0', '9', [&](const int &key) {
 		int k = key - '0';
-		this->emit("numkey", (void*)k);
+		this->emit("numkey", (void*) &k);
 	});
 	
 	keyboard->on(CSEEKL, [&](const int &key) {
@@ -376,7 +387,7 @@ int MainUI::exec()
 			return;
 		}
 		
-		int key = (int) p;
+		int key = *((int*) p);
 		play(getIndex(page, key));
 	});
 	

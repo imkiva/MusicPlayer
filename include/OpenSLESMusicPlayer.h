@@ -17,7 +17,7 @@ private:
 	SLObjectItf slOutputMix = NULL;
 	
 	SLEnvironmentalReverbItf outputMixEnvReverb = NULL;
-	const SLEnvironmentalReverbSettings reverbSettings =	SL_I3DL2_ENVIRONMENT_PRESET_STONECORRIDOR;
+	const SLEnvironmentalReverbSettings reverbSettings = SL_I3DL2_ENVIRONMENT_PRESET_STONECORRIDOR;
 
 	SLObjectItf uriPlayerObject = NULL;
 	SLPlayItf uriPlayerPlay = NULL;

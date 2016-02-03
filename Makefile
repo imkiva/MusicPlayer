@@ -1,18 +1,35 @@
 export ROOT := $(shell pwd)
 
 export CXX := g++
-export CXXFLAGS += -O2 -DANDROID -fPIC --pie \
+export CXXFLAGS += -O2 -fPIC --pie \
 	-std=c++11 -fexceptions -frtti \
 	-I$(ROOT)/include -I$(ROOT)/libjson/include \
-	-L$(ROOT)/libjson -ljson -lOpenSLES
+	-L$(ROOT)/libjson -ljson -lpthread
 
 export MAKE := make --no-print-directory
-
-export SRC := $(shell cd src && ls *.cc)
-export OBJ := $(SRC:.cc=.o)
 export BIN := player
 
+export SRC := CloudMusicApi.cc Lyric.cc MusicEntry.cc \
+	Http.cc LyricDownloader.cc  MusicScanner.cc \
+	Socket.cc Keyboard.cc main.cc Text.cc LocalCache.cc \
+	MainUI.cc Screen.cc
 
+
+
+
+export TARGET := 
+
+ifeq ($(TARGET), android)
+	SRC += OpenSLESMusicPlayer.cc
+	CXXFLAGS += -DANDROID -lOpenSLES
+else
+	SRC += SDL2MusicPlayer.cc
+	CXXFLAGS += -lSDL2 -lSDL2_mixer -lsmpeg2
+endif
+
+
+
+export OBJ := $(SRC:.cc=.o)
 
 all:
 	@cd libjson && $(MAKE)

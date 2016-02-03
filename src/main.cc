@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "config.h"
 #include "LocalCache.h"
 #include "MainUI.h"
 
@@ -15,6 +16,25 @@ static char bar[] = {
 };
 
 static int barIndex = 0;
+
+
+std::string getDataPath(char **argv)
+{
+	std::string data;
+	
+	if (argv[optind]) {
+		data.assign(argv[optind]);
+	}
+
+	const char *p = getenv(DATA_ENV);
+	if (p) {
+		data.assign(p);
+	} else {
+		data.assign(DATA_DEFAULT_PATH);
+	}
+
+	return std::move(data);
+}
 
 
 int main(int argc, char **argv) {
@@ -31,21 +51,14 @@ int main(int argc, char **argv) {
 		}
 	}
 	
-	std::string sdcard;
-	
-	if (argv[optind]) {
-		sdcard.assign(argv[optind]);
-	} else {
-		const char *p = getenv("EXTERNAL_STORAGE");
-		if (p) {
-			sdcard.assign(p);
-		} else {
-			sdcard.assign("/sdcard");
-		}
-	}
-	
-	std::string cacheFile = sdcard + "/Android/.player_cache";
-	
+	std::string data = getDataPath(argv);
+
+#ifdef ANDROID
+	std::string cacheFile = data + "/Android/.player_cache";
+#else
+	std::string cacheFile = data + "/.player_cache";
+#endif
+
 	if (update) {
 		unlink(cacheFile.c_str());
 	}
@@ -56,7 +69,7 @@ int main(int argc, char **argv) {
 	auto err = [&](void *p) {
 		printf("缓存不存在或已过期, 重新扫描\n");
 		
-		MusicScanner sr(sdcard);
+		MusicScanner sr(data);
 		
 		sr.on("finish", [&](void *p) {
 			printf("扫描完毕\n");

@@ -2,6 +2,7 @@
 #include <math.h>
 #include <unistd.h>
 #include <string.h>
+#include <limits.h>
 
 #include "LocalCache.h"
 
@@ -85,8 +86,10 @@ void LocalCache::readPlayListCache()
 				continue;
 			}
 			
-			MusicEntry e(buf);
-			v.push_back(e);
+			if (access(buf, R_OK) == 0) {
+				MusicEntry e(buf);
+				v.push_back(e);
+			}
 		}
 		
 		delete[] buf;

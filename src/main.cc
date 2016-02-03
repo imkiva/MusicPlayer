@@ -24,13 +24,13 @@ std::string getDataPath(char **argv)
 	
 	if (argv[optind]) {
 		data.assign(argv[optind]);
-	}
-
-	const char *p = getenv(DATA_ENV);
-	if (p) {
-		data.assign(p);
 	} else {
-		data.assign(DATA_DEFAULT_PATH);
+		const char *p = getenv(DATA_ENV);
+		if (p) {
+			data.assign(p);
+		} else {
+			data.assign(DATA_DEFAULT_PATH);
+		}
 	}
 
 	return std::move(data);

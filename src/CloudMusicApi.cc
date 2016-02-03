@@ -67,7 +67,7 @@ bool CloudMusicApi::downloadLyric(const std::string &musicName, std::string &lyr
 	ss << id;
 
 	try {
-		Http http("music.163.com", lyricParam + ss.str());
+		Http http(host, lyricParam + ss.str());
 		http.setMethod(GET);
 
 		setupHttpHeader(http);

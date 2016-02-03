@@ -41,7 +41,7 @@ void LyricDownloader::downloadLyric(MusicEntry *entry)
 		ly.ent = entry;
 		ly.lyric = &lyric;
 		
-		if (api->downloadLyric(entry->name, lyric)) {
+		if (api->downloadLyric(entry->getName(), lyric)) {
 			FILE *fp = fopen(entry->getLyricPath().c_str(), "w");
 			if (fp) {
 				fprintf(fp, "%s\n", lyric.c_str());

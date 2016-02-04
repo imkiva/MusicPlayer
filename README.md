@@ -1,7 +1,7 @@
 # MusicPlayer
 
 ## Overview
-A console music player for android, OpenSLES is required. <br/>
+A console music player for linux/android, SDL2/OpenSLES is required. <br/>
 
 See `include/Control.h` to customize keyboard bindings. <br/>
 

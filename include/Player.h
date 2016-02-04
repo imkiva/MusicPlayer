@@ -12,13 +12,20 @@ namespace kiva {
 
 typedef uint32_t Millisecond;
 
+enum PlayMode
+{
+	LOOP_ALL = 0,
+	LOOP_ONE = 1,
+	RANDOM   = 2,
+};
+
 enum PlayState
 {
-	NOT_READY,
-	WAITING,
-	PLAYING,
-	PAUSED,
-	STOPPED
+	NOT_READY = 0,
+	WAITING   = 1,
+	PLAYING   = 2,
+	PAUSED    = 3,
+	STOPPED   = 4,
 };
 
 

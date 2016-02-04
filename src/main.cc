@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "config.h"
+#include "Config.h"
 #include "LocalCache.h"
 #include "MainUI.h"
 
@@ -16,25 +16,6 @@ static char bar[] = {
 };
 
 static int barIndex = 0;
-
-
-std::string getDataPath(char **argv)
-{
-	std::string data;
-	
-	if (argv[optind]) {
-		data.assign(argv[optind]);
-	} else {
-		const char *p = getenv(DATA_ENV);
-		if (p) {
-			data.assign(p);
-		} else {
-			data.assign(DATA_DEFAULT_PATH);
-		}
-	}
-
-	return std::move(data);
-}
 
 
 int main(int argc, char **argv) {
@@ -51,14 +32,10 @@ int main(int argc, char **argv) {
 		}
 	}
 	
-	std::string data = getDataPath(argv);
-
-#ifdef ANDROID
-	std::string cacheFile = data + "/Android/.player_cache";
-#else
-	std::string cacheFile = data + "/.player_cache";
-#endif
-
+	Config *cfg = Config::get();
+	const std::string &data = cfg->getDataPath();
+	const std::string &cacheFile = cfg->getCacheFile();
+	
 	if (update) {
 		unlink(cacheFile.c_str());
 	}

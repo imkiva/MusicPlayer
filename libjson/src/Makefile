@@ -10,5 +10,4 @@ $(LIB): $(OBJ)
 
 .PHONY : clean
 clean: 
-	@echo -e "  CLEAN\t" $(OBJ)
-	@$(RM) $(OBJ) 2>/dev/null
+	@for i in $(OBJ); do echo -e "  CLEAN\t" $$i; $(RM) $$i; done

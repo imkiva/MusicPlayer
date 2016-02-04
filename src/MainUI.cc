@@ -53,7 +53,19 @@ MainUI::MainUI()
 #else
 	player = new SDL2MusicPlayer();
 #endif
-
+	
+	cfg = Config::get();
+	
+	playMode = cfg->getPlayMode();
+	needShowHelp = cfg->showHelp();
+	needShowPlayList = cfg->showPlayList();
+	
+	current = 0;
+	page = 0;
+	finish = false;
+	ui = false;
+	srand(time(NULL));
+	
 	keyboard = Keyboard::getDefault();
 	
 	keyboard->on(CEXIT, [&](const int &key) {
@@ -104,11 +116,17 @@ MainUI::MainUI()
 	keyboard->on(CSEEKR, [&](const int &key) {
 		this->emit("seek-right");
 	});
+	
+	setupEvent();
 }
 
 
 MainUI::~MainUI()
 {
+	cfg->setPlayMode(playMode);
+	cfg->setShowHelp(needShowHelp);
+	cfg->setShowPlayList(needShowPlayList);
+	
 	delete player;
 }
 
@@ -279,26 +297,8 @@ void MainUI::printUI()
 }
 
 
-void MainUI::setData(const std::vector<MusicEntry> &data)
+void MainUI::setupEvent()
 {
-	this->data = std::move(data);
-	emit("start");
-}
-
-
-int MainUI::exec()
-{
-	current = 0;
-	page = 0;
-	finish = false;
-	playMode = DEFAULT_PLAY_MODE;
-	needShowHelp = DEFAULT_SHOW_HELP;
-	needShowPlayList = DEFAULT_SHOW_PLAY_LIST;
-	
-	volatile bool ui = false;
-	
-	srand(time(NULL));
-	
 	this->on("start", [&](void *p) {
 		keyboard->start();
 		
@@ -408,8 +408,18 @@ int MainUI::exec()
 		Millisecond pos = player->getPosition() + 5000;
 		player->seek(pos);
 	});
-	
-	
+}
+
+
+void MainUI::setData(const std::vector<MusicEntry> &data)
+{
+	this->data = std::move(data);
+	emit("start");
+}
+
+
+int MainUI::exec()
+{
 	while (!finish) {
 		if (ui) {
 			printUI();

@@ -37,12 +37,3 @@
 /* 隐藏/显示 播放列表 */
 #define CPLAYLIST 'g'
 
-
-/* 默认显示帮助 */
-#define DEFAULT_SHOW_HELP true
-
-/* 默认显示播放列表 */
-#define DEFAULT_SHOW_PLAY_LIST true
-
-/* 默认播放模式: 列表循环 */
-#define DEFAULT_PLAY_MODE LOOP_ALL

@@ -5,6 +5,7 @@
 #include "MusicEntry.h"
 #include "Player.h"
 #include "LyricDownloader.h"
+#include "Config.h"
 
 #include "koll/Keyboard.h"
 #include "koll/Screen.h"
@@ -13,17 +14,11 @@
 
 namespace kiva {
 
-enum PlayMode
-{
-	LOOP_ALL,
-	LOOP_ONE,
-	RANDOM
-};
-
 class MainUI : public EventEmiter<std::string>
 {
 private:
 	koll::Keyboard *keyboard;
+	Config *cfg;
 	Player *player;
 	
 	LyricDownloader lyDownloader;
@@ -42,8 +37,11 @@ private:
 	volatile bool finish;
 	volatile bool needShowHelp;
 	volatile bool needShowPlayList;
+	volatile bool ui;
 
 private:
+	void setupEvent();
+	
 	void play(int pos);
 	void playNext();
 	void playPrev();

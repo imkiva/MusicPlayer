@@ -14,10 +14,13 @@ See `include/Control.h` to customize keyboard bindings. <br/>
 - Lyric support(lrc only)
 - Download lyric from network
 - Progress bar
+- Save configurations
 
 ## Know Issues
 - Segfault if you press the keyboard too fast
 - Deadlock if you press the keyboard too fast
+- Stop playing if the audio source is broken
 
 ## Bug Report
 E-mail: kiva515@foxmail.com <br/>
+

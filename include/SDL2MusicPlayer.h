@@ -14,8 +14,6 @@ namespace kiva {
 
 class SDL2MusicPlayer : public Player
 {
-	friend void hookMusicFinish();
-
 private:
 	volatile PlayState playState = NOT_READY;
 	Mix_Music *music = NULL;

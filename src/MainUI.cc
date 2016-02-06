@@ -144,7 +144,10 @@ void MainUI::play(int pos)
 		lyDownloader.downloadLyric(&(data[pos]));
 	}
 	
-	player->setSource(e.getPath());
+	if (!player->setSource(e.getPath())) {
+		playNext();
+	}
+	
 	player->play();
 }
 

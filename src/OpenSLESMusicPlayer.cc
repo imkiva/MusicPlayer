@@ -86,9 +86,17 @@ bool OpenSLESMusicPlayer::setSource(const std::string &path)
 		SL_BOOLEAN_TRUE
 	};
 	
-	(*slEngine)->CreateAudioPlayer(slEngine, &uriPlayerObject,&audioSrc, &audioSnk, 1, ids, req);
+	SLresult res;
+	
+	res = (*slEngine)->CreateAudioPlayer(slEngine, &uriPlayerObject,&audioSrc, &audioSnk, 1, ids, req);
+	if (res != SL_RESULT_SUCCESS) {
+		if (uriPlayerObject) {
+			(*uriPlayerObject)->Destroy(uriPlayerObject);
+		}
+		return false;
+	}
 
-	SLresult res = (*uriPlayerObject)->Realize(uriPlayerObject, SL_BOOLEAN_FALSE);
+	res = (*uriPlayerObject)->Realize(uriPlayerObject, SL_BOOLEAN_FALSE);
 	if (res != SL_RESULT_SUCCESS) {
 		(*uriPlayerObject)->Destroy(uriPlayerObject);
 		uriPlayerObject = NULL;

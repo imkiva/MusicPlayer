@@ -16,7 +16,7 @@ See `include/Control.h` to customize keyboard bindings. <br/>
 - Progress bar
 - Save configurations
 
-## Know Issues
+## Known Issues
 - Segfault if you press the keyboard too fast
 - Deadlock if you press the keyboard too fast
 - Stop playing if the audio source is broken

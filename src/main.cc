@@ -38,6 +38,9 @@ int main(int argc, char **argv) {
 	
 	if (update) {
 		unlink(cacheFile.c_str());
+		cfg->setCurrentItem(0);
+		cfg->setCurrentPosition(0);
+		cfg->setCurrentPage(0);
 	}
 	
 	MainUI ui;

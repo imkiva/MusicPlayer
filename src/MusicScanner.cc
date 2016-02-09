@@ -1,4 +1,5 @@
 #include <sys/types.h>
+#include <unistd.h>
 #include <string.h>
 
 #include <regex>
@@ -13,6 +14,18 @@ static bool acceptName(const std::string &name)
 	static std::regex reg(".*(\\.mp3|\\.ogg|\\.wav)", std::regex_constants::icase);
 	
 	return std::regex_match(name, reg);
+}
+
+
+static bool acceptDir(const std::string &dir)
+{
+	const std::string &nomedia = dir + "/.nomedia";
+	
+	if (access(nomedia.c_str(), R_OK) == 0) {
+		return false;
+	}
+	
+	return true;
 }
 
 
@@ -68,6 +81,10 @@ void MusicScanner::clearResult()
 
 void MusicScanner::doScanDir(const std::string &path)
 {
+	if (!acceptDir(path)) {
+		return;
+	}
+	
 	DIR *dir;
 	struct dirent *e;
 	

@@ -19,6 +19,9 @@
 #define KEY_SHOW_HELP "show_help"
 #define KEY_SHOW_PLAYLIST "show_playlist"
 #define KEY_PLAYMODE "playmode"
+#define KEY_CURRENTITEM "current_item"
+#define KEY_CURRENTPAGE "current_page"
+#define KEY_CURRENTPOS  "current_pos"
 
 /* 默认显示帮助 */
 #define DEFAULT_SHOW_HELP true
@@ -53,10 +56,16 @@ public:
 	bool showHelp();
 	bool showPlayList();
 	PlayMode getPlayMode();
+	int getCurrentItem();
+	int getCurrentPage();
+	Millisecond getCurrentPosition();
 	
 	void setShowHelp(bool b);
 	void setShowPlayList(bool b);
 	void setPlayMode(PlayMode mode);
+	void setCurrentItem(int pos);
+	void setCurrentPage(int page);
+	void setCurrentPosition(Millisecond pos);
 };
 
 }

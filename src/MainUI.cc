@@ -59,9 +59,10 @@ MainUI::MainUI()
 	playMode = cfg->getPlayMode();
 	needShowHelp = cfg->showHelp();
 	needShowPlayList = cfg->showPlayList();
+	current = cfg->getCurrentItem();
+	page = cfg->getCurrentPage();
+	currPosition = cfg->getCurrentPosition();
 	
-	current = 0;
-	page = 0;
 	finish = false;
 	ui = false;
 	srand(time(NULL));
@@ -126,6 +127,9 @@ MainUI::~MainUI()
 	cfg->setPlayMode(playMode);
 	cfg->setShowHelp(needShowHelp);
 	cfg->setShowPlayList(needShowPlayList);
+	cfg->setCurrentItem(current);
+	cfg->setCurrentPage(page);
+	cfg->setCurrentPosition(currPosition);
 	
 	delete player;
 }
@@ -234,23 +238,30 @@ void MainUI::showLyric(const Lyric &ly)
 	
 	printf("\n");
 	
+	/* 最大拓展的歌词显示行数 */
+	/* 即最多显示前后 overshow 句歌词 */
+	int overshow = 1;
+	
 	int index;
 	const std::string &mid = ly.getLyric(currPosition, &index);
 	
-	if (index > 0) {
-		Screen::mprint(ly.getLyricAt(index-1));
-		/* mprint 不会自动换行 */
-		printf("\n");
-	} else {
-		printf("\n");
+	if (!needShowPlayList && !needShowHelp) {
+		overshow = 5;
+	}
+	
+	for (int i=overshow; i>0; i--) {
+		Screen::mprint(ly.getLyricAt(index-i));
+		putchar('\n'); /* mprint 不会自动换行 */
 	}
 	
 	printf("\e[1;33m");
 	Screen::mprint(mid);
 	printf("\e[0m\n");
 	
-	Screen::mprint(ly.getLyricAt(index+1));
-	printf("\n");
+	for (int i=1; i<=overshow; i++) {
+		Screen::mprint(ly.getLyricAt(index+i));
+		putchar('\n');
+	}
 }
 
 
@@ -327,7 +338,17 @@ void MainUI::setupEvent()
 			}
 		});
 		
-		play(0);
+		if (current < 0 || current >= data.size()) {
+			current = 0;
+		}
+		
+		int pageMax = data.size() / PAGE_ITEM;
+		if (page < 0 || page >= pageMax) {
+			page = 0;
+		}
+		
+		play(current);
+		player->seek(currPosition);
 		ui = true;
 	});
 	
@@ -430,7 +451,7 @@ int MainUI::exec()
 		}
 	}
 	
-	while (!finish);
+	ui = false;
 	keyboard->stop();
 		
 	removeEvent("pause");
